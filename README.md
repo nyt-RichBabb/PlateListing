@@ -25,7 +25,7 @@ The Plate Tracking System is designed to manage and track printing plate jobs. I
 ### File Structure
 - `index.html`: Main HTML file that serves as the front-end interface.
 - `index.js`: Server-side script handling HTTP requests, WebSocket connections, and scheduled tasks.
-- `UNCBenderWatch.js`: Script for monitoring and processing files from a network path.
+- `UNC2BenderWatch.js`: Script for monitoring and processing files from a network path.
 - `public/`: Directory containing static files served by the server.
 - `logs/`: Directory for storing log files.
 - `tmp/`: Directory for temporary files and processing logs.
@@ -34,7 +34,7 @@ The Plate Tracking System is designed to manage and track printing plate jobs. I
 The front end of the Plate Tracking System provides a dynamic and interactive interface for managing printing plate jobs. When the page loads, it fetches job information from the server and displays it in a user-friendly format. Users can interact with the job listings through zoom controls, view toggles, context menus, and more. Real-time updates ensure that users always have the latest information without needing to refresh the page.
 
 ### Back-End Operation Description
-The back end of the system is responsible for serving static files, processing client requests, managing WebSocket connections, and performing maintenance tasks. The UNCBenderWatch.js script monitors a network Nela Bender path for new files, processes them, and organizes them into directories. Scheduled tasks ensure the system remains organized by deleting old jobs and clearing incomplete file groups.
+The back end of the system is responsible for serving static files, processing client requests, managing WebSocket connections, and performing maintenance tasks. The UNC2BenderWatch.js script monitors a network Nela Bender path for new files, processes them, and organizes them into directories. Scheduled tasks ensure the system remains organized by deleting old jobs and clearing incomplete file groups.
 
 ### Acknowledgements
 - Node.js
