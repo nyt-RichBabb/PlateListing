@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Plate Listing</title>
+	<style>
+	.zoom-popup {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: white;
+        border: 1px solid #ddd;
+        padding: 10px;
+		z-index: 1001;
+    }
+
+    #zoomIn, #zoomOut {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+		z-index: 1001;
+    }
+
+    #pageContainer {
+        transition: transform 0.3s ease;
+        transform-origin: top left; /* Adjust as needed */
+    }
+
+	#contextMenu {
+    position: absolute;
+    background-color: #f0f0f0;
+    border: 1px solid #d4d4d4;
+    z-index: 1000;
+    display: none;
+	}
+	#contextMenu .menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+	}
+	#contextMenu .menu-item:hover {
+    background-color: #ececec;
+	}
+
+  .center-container {
+    display: flex;
+    justify-content: left;
+	width: 95%;
+	/* height: 10vh; */
+	margin: 0 auto;
+	margin-left: 2.5%;
+	margin-right: 2.5%;
+  }
+
+#selectpress-popup-window {
+  display: none; /* Initially hidden */
+  position: fixed; /* Float above everything */
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  width: 175px;
+  transform: translate(-50%, -50%); /* Adjust to truly center based on its size */
+  background: white;
+  font-size: 25px;
+  font-family: 'Calibri', sans-serif;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  z-index: 100; /* Ensure it's above other content */
+  padding-left: 50px;
+  padding-right: 0px;
+  padding-top: 50px;
+  padding-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: Add some shadow for better visibility */
+}
+
+#selectpress-popup-window .close-btn {
+  position: absolute;
+  top: -3px;
+  right: -2px;
+  color: gray;
+  cursor: pointer;
+  font-size: 25px;
+  background: none;
+  border: none;
+}
+
+.clear-btn {
+  margin-top: 15px; /* Space between the checkboxes and the button */
+  font-size: 20px;
+  display: block;
+  margin-left: 25px;
+  /* Add more styles as needed */
+}
+
+.presspopup-title {
+  position: absolute;
+  top: -28px;
+  left: 3px;
+  color: white;
+  background-color: #2F4F4F;
+  text-align: left; 
+  padding-top: 0px;
+  /*padding-background: 0px;*/
+  padding-right: 2px;
+  padding-left: 2px;
+  margin-bottom: 20px;
+}
+	
+	.last-processed-popup {
+    position: absolute;
+	font-family: "Lucida Console", Lucida Console, monospace;
+	font-size: 13px;
+	color: white;
+	/* font-weight: bold; */
+    bottom: 6px; 
+    left: 15px;
+    background-color: #2F4F4F;
+    border: 1px solid #ccc;
+    padding: 2px;
+    border-radius: 5px;
+    z-index: 1;
+    /* display: none; */
+	}
+	
+	#login-modal {
+    z-index: 10; 
+	}
+	
+	.edit-icon {
+    position: absolute;
+    top: 50px; 
+    left: 8px; 
+    cursor: pointer;
+	z-index: 3;
+	/*visibility: hidden;*/
+	}
+	:root {
+		--bullet-color-cyan: #0ff;
+		--bullet-color-magenta: #f0f;
+		--bullet-color-yellow: #ff0;
+		--bullet-color-black: #000;
+	}
+	#toggleView {
+    position: fixed;
+    top: 4px;
+    left: 7px;
+    cursor: pointer;
+	/*box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);  Add this line for the shadow */
+    z-index: 100;
+	}
+	.rotate-0 {
+    transform: rotate(0deg);
+	}
+	.rotate-90 {
+    transform: rotate(90deg);
+	}
+	
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 18px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 10px;
+  width: 10px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.hover-menu {
+  position: absolute;
+  top: 38px;
+  left: 12px;
+  font-family: 'Calibri', sans-serif;
+  background-color: white;
+  border: 1px solid #ddd;
+  z-index: 6; /* Make sure the menu appears above other elements */
+  display: none;
+}
+
+.menu-item {
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.menu-item:hover {
+  background-color: #f1f1f1;
+}
+
+	
+	.overlay {
+		display: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		font-family: 'Calibri', sans-serif;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.7);
+		z-index: 4;
+	}
+	
+	.directories-container {
+		display: flex;
+		flex-wrap: wrap;
+		/*justify-content: center;*/
+	}
+	
+	.flex-break {
+      flex-grow: 1;
+      min-width: 100%; /* This ensures it takes the full width, moving subsequent items to the next line */
+	}
+	
+	hr {
+	top: 3px;
+    width: 100%; 
+}
+.hr-text {
+	width: 95%;
+    height: 16px; 
+    /*background-color: #e8e8eb;*/
+	background: linear-gradient(to right, #fafafa, #888, #ebebeb);
+	border: 0;
+    position: relative; /* Needed to position the pseudo-element */
+    overflow: visible; /* Ensures the text is visible outside the hr line */
+}
+.pr-hr-text {
+	width: 95%;
+    height: 16px; 
+    background: linear-gradient(to right, #fafafa, #046e0a, #fafafa);
+	/*background: linear-gradient(to right, #303030, #00ff00, #303030);*/
+	border: 0;
+    position: relative; /* Needed to position the pseudo-element */
+    overflow: visible; /* Ensures the text is visible outside the hr line */
+}
+
+.hr-text::before {
+    font-size: 16px;
+	font-family: 'Calibri', sans-serif;
+	font-weight: bold;
+	color: black;
+    content: '❍ Unprocessed'; 
+	/*border: 1px solid #0c0c0c;*/
+    position: absolute; /* Position relative to the hr */
+    left: 0px;
+    top: -5px;
+    /*transform: translate(-50%, -50%); */
+    background-color: transparent; /* Background color for the text */
+    padding: 0 5px; /* Padding around the text */
+}
+
+.pr-hr-text::before {
+    font-size: 16px;
+	font-family: 'Calibri', sans-serif;
+	font-weight: bold;
+	color: black;
+    /*content: '▽ Active / Completed ▽';*/
+	/*border: 1px solid #0c0c0c;*/
+    position: absolute; /* Position relative to the hr */
+    left: 0px;
+    top: -5px;
+    /*transform: translate(-50%, -50%); */
+    background: transparent;
+    padding: 0 5px; /* Padding around the text */
+}
+
+.pr-hr-text[data-content="COMPACT"]::before {
+	content: '☯ Completed / Active';
+}
+.pr-hr-text[data-content="COMP"]::before {
+    content: '● Completed';
+}
+.pr-hr-text[data-content="ACT"]::before {
+    content: '☯ Active';
+}
+
+	.directory-column {
+		overflow: hidden;
+		flex: 0 0 calc(12% - 20px);
+		border: 1px solid #ddd;
+		padding: 5px;
+		margin: 5px;
+		margin-bottom: 5px;
+		padding-bottom: 0px;
+		box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+		position: relative;
+		overflow: hidden;
+		min-width: 350px;
+		min-height: 360px;
+		max-height: 360px;
+	}
+	
+	::-webkit-scrollbar {
+		background-color: transparent;
+	}
+	
+	.directory-column {
+		scrollbar-width: thin;
+		scrollbar-color: transparent transparent;
+	}
+	
+	.directory-column::-webkit-scrollbar {
+		width: thin;
+	}
+	
+	.directory-column::-webkit-scrollbar-thumb {
+		background-color: transparent;
+	}
+	
+	.directory-column::-webkit-scrollbar-track {
+		background-color: transparent;
+	}
+	
+	.directory-column:hover ::-webkit-scrollbar-thumb {
+		background-color: #888;
+	}
+	
+	.directory-column:hover ::-webkit-scrollbar-track {
+		background-color: #f1f1f1;
+	}
+	
+	.directory-column:hover {
+		scrollbar-color: #888 #f1f1f1;
+		/* Adjust colors as needed */
+	}
+	
+	.directory-column h2,
+	.directory-column h3 {
+		display: flex;
+		/* justify-content: space-between;*/
+		/* This will push child items to the start and end of the container */
+		align-items: center;
+		text-align: center;
+		border-bottom: 1px solid #ddd;
+		padding-bottom: 0px;
+		margin-bottom: 0px;
+		padding-right: 7px;
+		padding-left: 35px;
+		margin-top: 0px;
+		font-size: 28px;
+		font-family: 'Calibri', sans-serif;
+		color: white;
+		overflow: hidden;
+		white-space: pre;
+		background-color: black;
+		/*background: linear-gradient(to right, #000000, #151152, #000000);*/
+		z-index: 3;
+		/* Higher than the scrollable-content */
+		position: relative;
+		/* To make z-index take effect */
+	}
+	
+	.vdate-style {
+		flex-grow: 1;
+		/* This will allow vdate to grow and center itself */
+		text-align: right;
+		/* Center the text inside the vdate span */
+		color: white;
+		/* Example color for vdate */
+		font-size: 30px;
+		/* Example size */
+		/* add more styling as required */
+	}
+	
+	.vpub-style {
+		text-align: left;
+		/* Align vpub to the left */
+		flex-grow: 0;
+		/* Prevent vpub from growing */
+		color: white;
+		/* Example color for vpub */
+		font-size: 30px;
+		/* Example size */
+		/* add more styling as required */
+	}
+	
+	.vpress-style {
+		text-align: right;
+		flex-grow: 1;
+		/* This will allow vpress to occupy the remaining space in the flex container */
+		color: #fcba5d;
+		font-size: 38px;
+		font-family: 'Arial', sans-serif;
+	}
+	
+	.vpress-style-unproc {
+		text-align: right;
+		flex-grow: 1;
+		color: #ffffff;
+		font-size: 38px;
+		font-family: 'Arial', sans-serif;
+	}
+	
+	.sub-directory {
+		margin-left: 0px;
+		padding-left: 0px;
+	}
+	
+	li,
+	ul {
+		margin-left: 2em;
+		padding: 1px;
+		font-family: "Lucida Console", Lucida Console, monospace;
+		list-style-type: none;
+		/* This removes the bullet points */
+	}
+	
+	.style-for-delete-btn {
+		position: absolute;
+		top: 17px;
+		left: 13px;
+		background-color: #83b874;
+		/* green box */
+		width: 20px;
+		height: 20px;
+		cursor: pointer;
+		z-index: 3;
+	}
+	.style-for-unproc-btn {
+		position: absolute;
+		top: 17px;
+		left: 13px;
+		/*background-color: gray;*/
+		background-color: #9c9c9c;
+		/* gray box */
+		width: 20px;
+		height: 20px;
+		cursor: pointer;
+		z-index: 3;
+	}
+	.style-for-inactive-btn {
+		position: absolute;
+		top: 17px;
+		left: 13px;
+		background-color: #343;
+		/*background-color: #294721;*/
+		/* muted green box */
+		width: 20px;
+		height: 20px;
+		cursor: pointer;
+		z-index: 3;
+	}
+	.style-for-delete-btn:hover {
+		background-color: gray;
+	}
+	
+/*	.style-for-delete-btn:hover::after {
+		content: "Clear or Delete listing...";
+		position: absolute;
+		left: 100%;
+		top: 100%;
+		background-color: blue;
+		color: #fff;
+		padding: 5px;
+		border-radius: 5px;
+		white-space: nowrap;
+		margin-left: 5px;
+		transform: translateY(-50%);
+	}*/
+	
+	.red-delete-btn {
+		background-color: red !important;
+		/* Overriding other background color */
+	}
+	.directory-column.empty {
+		background-color: #f5f5f0;
+	}
+	
+	.cyan-bullet::before,
+	.magenta-bullet::before,
+	.yellow-bullet::before,
+	.black-bullet::before {
+		display: inline-block;
+		width: .60em;
+		margin-left: -15px;
+		margin-right: 4px;
+		border: 1px solid gray;	
+	}
+	
+	.cyan-bullet::before {
+		content: "█";
+		color: var(--bullet-color-cyan);
+	}
+	
+	.magenta-bullet::before {
+		content: "█";
+		color: var(--bullet-color-magenta);
+	}
+	
+	.yellow-bullet::before {
+		content: "█";
+		color: var(--bullet-color-yellow);
+	}
+	
+	.black-bullet::before {
+		content: "█";
+		color: var(--bullet-color-black);
+	}
+	
+	.directory-column div.sub-directory span {
+		display: inline;
+	}
+	
+	.completed-message {
+		position: absolute;
+		width: 96%;
+		height: 59%;
+		top: 15%;
+		/* Centering it vertically */
+		left: 2.125%;
+		/* Centering it horizontally */
+		background-color: rgba(247, 252, 149, 1);
+		/* Yellow with transparency */
+		color: black;
+		font-family: 'Calibri', sans-serif;
+		font-size: 45px;
+		font-weight: bold;
+		display: flex;
+		align-items: flex-start;
+		/* Aligns text to the start of the container */
+		justify-content: center;
+		text-align: center;
+		padding-top: 25%;
+		/* Moves the text down by 25% */
+		z-index: 4;
+	}
+	
+	.scrollable-content {
+		max-height: calc(360px - 50px);
+		/* Deducting an approximate height for the h2
+      			heading */
+		overflow-y: auto;
+		margin-top: -10px;
+		padding-bottom: 0px;
+		z-index: 1;
+		/* Lower than the headers */
+	}
+/*	.alternate-view-ul {
+	margin-top: 10px;
+	margin-bottom: 5px;
+     your styles here 
+}*/
+	</style>
+</head>
+
+<body>
+<div id="zoomControl" class="zoom-popup" style="display: none;">
+    <a href="#" id="closeZoomControl" style="display: block; top: -3px; text-align: right; margin-bottom: 10px; color: gray; font-family: 'Calibri', sans-serif; cursor: pointer; text-decoration: none;">X</a>
+    <button id="zoomIn">+</button>
+    <button id="zoomOut">-</button>
+    <p id="zoomLevelDisplay">Zoom: 100%</p>
+    <a href="#" id="returnZoom" style="display: block; text-align: center; margin-top: 5px; cursor: pointer; text-decoration: none;">⏎</a>
+</div>
+
+<div id="pageContainer">
+
+	<div id="toggleView" class="rotate-90" >▶</div>
+<!--	<div class="center-container"> -->
+<div id="outerContainer" class="flex-container">
+	<div class="directories-container"></div>
+
+<div id="contextMenu" class="hover-menu" style="display: none;">
+    <!-- Menu items will be added dynamically -->
+</div>
+
+<div class="hover-menu">
+  <div class="menu-item" onclick="confirmClearList()">Clear List</div>
+  <div class="menu-item" onclick="confirmDeleteList()">Delete List</div>
+</div>
+
+<div id="login-modal" class="overlay" style="display: none;">
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 5px;">
+        <h2>Privileged Action!</h2>
+        <p>Please authenticate first.</p>
+        <!-- Toggle Switch -->
+        <label class="switch">
+            <input type="checkbox" id="toggleUsername" onclick="toggleUsernameField()">
+            <span class="slider round"></span>
+        </label> &nbsp;&nbsp;Basic / Advanced
+        <br>
+		<br>
+        <input type="text" id="username" placeholder="Enter Username" style="display: none;" />
+		<br>
+        <input type="password" id="password" placeholder="Enter Password" />
+        <button onclick="authenticate()">Submit</button>
+        <button onclick="closeLoginModal()">Cancel</button>
+        <br><h2></h2>
+    </div>
+</div>
+</div>
+
+<div id="popup-window" style="display: none; position: fixed; top: 100px; left: calc(50% + 10px); background: white; padding: 5px; border-radius: 5px; z-index: 100;">
+	<button id="selectall-btn">Select/Deselect All</button>
+    <button id="delete-selected-btn">Delete Selected</button>
+	<button id="return-btn">Done</button>
+</div>
+
+<div id="customAlert" style="display:none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: #fffbc7; font-family: 'Calibri', sans-serif; font-size: 20px; font-weight: bold; padding: 20px; border: 2px solid #aaa; border-radius: 10px; z-index: 9999;">
+    alert box.
+</div>
+
+</div>
+<script>
+let centerContainer = true;
+let isAlternateView = true;
+let isAuthenticated = false;
+let authLevel = null;
+let selectAllState = true;
+let FromLogin = null;
+let selectedDirectory = null;
+let UtilView = false;
+let UnprocMenu = true;
+let HideUnprocessed = false;
+let SeparateJobs = false;
+let orderView = 'newOrder'; // values: 'default', 'newOrder'
+let directoryFileCounts = {}; // This will store the file counts for each directory
+let directoryCycleCounts = {};
+
+    let zoomLevel = 1; // Default zoom level
+	let zoomSave = zoomLevel;
+
+    document.getElementById('zoomIn').addEventListener('click', function() {
+        zoomLevel += 0.0125; // Increase zoom
+		zoomSave = zoomLevel;
+        applyZoom();
+    });
+
+    document.getElementById('zoomOut').addEventListener('click', function() {
+        zoomLevel -= 0.0125; // Decrease zoom
+		zoomSave = zoomLevel;
+        applyZoom();
+    });
+
+    document.getElementById('returnZoom').addEventListener('click', function() {
+        //zoomLevel = 1; // Return zoom
+        toggleZoom();
+    });
+
+    // Event listener to close/hide the zoom controls
+    document.getElementById('closeZoomControl').addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent the default anchor link behavior
+        document.getElementById('zoomControl').style.display = 'none';
+    });
+
+function applyZoom() {
+    const pageContainer = document.getElementById('pageContainer');
+    const zoomControl = document.getElementById('zoomControl');
+    const zoomLevelDisplay = document.getElementById('zoomLevelDisplay'); // Get the zoom level display element
+
+    if ('zoom' in document.body.style) {
+        document.body.style.zoom = zoomLevel;
+    } else {
+        pageContainer.style.transform = 'scale(' + zoomLevel + ')';
+    }
+    // Update the zoom level display. Adjust the zoom level to a percentage for better readability
+    zoomLevelDisplay.textContent = 'Zoom: ' + Math.round(zoomLevel * 100) + '%';
+
+    // Apply inverse scale to zoom controls
+    const inverseZoomLevel = 1 / zoomLevel;
+    zoomControl.style.transform = `scale(${inverseZoomLevel})`;
+    zoomControl.style.transformOrigin = 'right bottom';
+}
+
+	
+	function toggleZoom() {
+		if (zoomLevel === zoomSave) {
+			zoomLevel = 1;
+		} else {
+		zoomLevel = zoomSave;
+		}
+		applyZoom();
+	}
+
+// display Filter Press via URL
+showPressURL();
+
+const toggleViewElement = document.getElementById('toggleView');
+toggleViewElement.style.color = 'gray';
+
+// Single Click Event
+toggleViewElement.addEventListener('click', function() {
+  isAlternateView = !isAlternateView;
+  fetchDirectories(); // this will refresh the directories and the view 
+  // Toggle the rotation class
+  toggleViewElement.classList.toggle('rotate-90', isAlternateView);
+});
+
+// Double Click Event
+toggleViewElement.addEventListener('dblclick', function(event) {
+	showContextMenu(event.pageX, event.pageY);
+    if (UtilView ) {
+        this.style.color = 'black'; // Change the color back to black
+        UtilView = false;
+    } else if (authLevel === "level3"){
+        this.style.color = 'red'; // Change the color to red
+        UtilView = true;
+    }
+    console.log('UtilView is now', UtilView); // Just for verification
+    event.stopPropagation(); // Prevent single click event after double click
+});
+
+
+function toggleUtilView() {
+    // Create a new event for 'dblclick'
+    let event = new MouseEvent('dblclick', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+    });
+
+    // Dispatch the event on the toggleViewElement
+    toggleViewElement.dispatchEvent(event);
+}
+
+function toggleOrderView() {
+    orderView = orderView === 'default' ? 'newOrder' : 'default';
+    fetchDirectories();
+}
+
+function toggleCenterContainers() {
+    centerContainer = !centerContainer;
+    fetchDirectories();
+}
+
+function toggleHideUnprocessed() {
+    HideUnprocessed = !HideUnprocessed;
+    fetchDirectories();
+}
+
+function toggleSeparateJobs() {
+    SeparateJobs = !SeparateJobs;
+    fetchDirectories();
+}
+
+function renderAlternateView(item, container, selectedDirectory, directoryName) {
+//console.log(selectedDirectory);
+  // Check if the item is a file and its name is not '-'
+  if (item.type === 'file' && item.name !== '-') {
+    // Check if this is the selected directory for editing
+    if (selectedDirectory === directoryName) {
+	  //isEditView = true;
+      // Add an edit icon only for the selected directory
+      const editIcon = document.createElement('div');
+      editIcon.className = 'edit-icon';
+      editIcon.textContent = '✎';
+      //editIcon.onclick = () => renderEditView(item, container);
+	  editIcon.onclick = () => fetchDirectories();
+      container.appendChild(editIcon);
+    }
+
+    // Define the color mapping for file extensions
+    const colorMapping = {
+      '.CYAN': 'cyan',
+      '.MAGENTA': 'magenta',
+      '.YELLOW': 'yellow',
+      '.BLACK': 'black'
+    };
+    
+    // Get the pagename (filename without extension)
+    const pagename = item.name.split('.')[0];
+    
+    // Create or get the color blocks array for the current pagename
+    const colorBlocks = (container.dataset[pagename] || '').split(',');
+    
+    // Create a color block for the current file and add it to the array
+    const ext = Object.keys(colorMapping).find(ext => item.name.endsWith(ext)) || '';
+    const color = colorMapping[ext] || 'white';
+    const colorBlock = createColorBlock(color);
+    colorBlocks.push(colorBlock.outerHTML);
+    
+    // Store the color blocks array back in the dataset
+    container.dataset[pagename] = colorBlocks.join(',');
+    
+    // Render the pagename and color blocks in a row
+    renderPagenameAndColorBlocks(container, pagename);
+  }
+}
+
+function selectDirectoryForEditing(directoryName) {
+  selectedDirectory = directoryName;
+  // Remove the class from other directories
+  const directoryColumns = document.querySelectorAll('.directory-column');
+  directoryColumns.forEach((column) => {
+    column.classList.remove('editing');
+  });
+  // Add the class to the selected directory
+  const selectedColumn = document.querySelector(`[data-directory="${directoryName}"]`);
+  if (selectedColumn) {
+    selectedColumn.classList.add('editing');
+  }
+}
+
+
+function renderEditView(item, container) {
+	  setTimeout(showPopup, 10);
+      // Add an edit icon only for the selected directory
+      const editIcon = document.createElement('div');
+      editIcon.className = 'edit-icon';
+      editIcon.textContent = '↩';
+      editIcon.onclick = () => {
+		DoneEditing();
+	  }
+      container.appendChild(editIcon);
+
+    // Define the color mapping for file extensions
+    const colorMapping = {
+        '.CYAN': 'cyan',
+        '.MAGENTA': 'magenta',
+        '.YELLOW': 'yellow',
+        '.BLACK': 'black',
+    };
+
+    // Split the item name to get the base name and extension
+    const [baseName, ext] = item.name.split('.');
+
+    // Check if a basenameDiv for the current basename already exists
+    let baseNameDiv = container.querySelector(`[data-pagename="${baseName}"]`);
+
+    if (!baseNameDiv) {
+        // If it doesn't exist, create a new basenameDiv
+        baseNameDiv = document.createElement('div');
+        baseNameDiv.style = "margin-top: 0px;width: 198px;display: flex;align-items: center;background-color: white;margin-left: 35px;padding-right: 0px;font-family: 'Lucida Console', monospace;";
+        baseNameDiv.textContent = baseName + '→';
+        baseNameDiv.setAttribute('data-pagename', baseName);
+        container.appendChild(baseNameDiv);
+		
+        // Add click event listener to toggle checkboxes
+        baseNameDiv.addEventListener('click', function(event) {
+            // Check if the clicked element is the baseNameDiv itself
+//			showPopup();
+            if (event.target === baseNameDiv) {
+                const checkboxes = baseNameDiv.querySelectorAll('input[type="checkbox"]');
+                const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = !allChecked;
+//					showPopup();
+                });
+            }
+        });
+    }
+
+    // Create a checkbox with the corresponding color
+    const color = colorMapping['.' + ext] || 'white';
+    const checkboxDiv = createColorBlockWithCheckbox(color, baseName + '.' + ext);
+
+    // Append the checkbox to the baseNameDiv
+    baseNameDiv.appendChild(checkboxDiv);
+	
+}
+
+function createColorBlockWithCheckbox(color, itemName) {
+    const colorBlock = document.createElement('div');
+    colorBlock.style = "padding: 0px; text-align: center; width: 20px; background-color: " + color + "; margin-top: 2px; margin-left: 2px; border: 1px solid gray; position: relative;";
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = itemName;
+//	checkbox.addEventListener('mouseover', showPopup);
+    checkbox.style = "position: absolute; top: -1.60px; left: -1px; opacity: 0.9;";
+    const colorBlockText = document.createElement('span');
+    colorBlockText.textContent = '█';
+    colorBlockText.style.color = color === 'white' ? 'black' : color;
+    colorBlock.appendChild(checkbox);
+    colorBlock.appendChild(colorBlockText);
+    return colorBlock;
+}
+
+function createColorBlock(color) {
+  const colorBlock = document.createElement('div');
+  colorBlock.style.padding = '0px';
+  colorBlock.style.textAlign = 'center';
+  colorBlock.style.width = '20px';
+  colorBlock.style.backgroundColor = color;
+  colorBlock.style.marginTop = '2px';
+  colorBlock.style.marginLeft = '2px';
+  colorBlock.style.border = '1px solid gray';
+
+  const colorBlockText = document.createElement('span');
+  colorBlockText.textContent = '█';
+  colorBlockText.style.color = color === 'white' ? 'black' : color;
+
+  colorBlock.appendChild(colorBlockText);
+
+  return colorBlock;
+}
+
+function renderPagenameAndColorBlocks(container, pagename) {
+    // Create a div to hold the pagename and color blocks
+    const pagenameDiv = document.createElement('div');
+    pagenameDiv.style.marginTop = '0px';
+    pagenameDiv.style.width = '198px';
+    pagenameDiv.style.display = 'flex';
+    pagenameDiv.style.alignItems = 'center';
+    pagenameDiv.style.backgroundColor = 'white';
+    pagenameDiv.style.marginLeft = '35px';
+    pagenameDiv.style.paddingRight = '0px';
+    pagenameDiv.style.fontFamily = '"Lucida Console", Lucida Console, monospace';
+    
+    // Set the text content of the pagenameDiv to the new pagename
+    pagenameDiv.textContent = pagename+"→";
+
+    // Retrieve color blocks associated with the pagename from the container's dataset
+    const colorBlocksString = container.dataset[pagename];
+    
+    if (colorBlocksString) {
+        const colorBlocks = colorBlocksString.split(',');
+
+        // Append color blocks to the pagenameDiv
+        colorBlocks.forEach(block => {
+            pagenameDiv.innerHTML += block;
+        });
+    }
+
+    // Remove any existing pagenameDiv elements with the same pagename
+    const existingPagenameDivs = container.querySelectorAll(`[data-pagename="${pagename}"]`);
+    existingPagenameDivs.forEach(div => {
+        container.removeChild(div);
+    });
+
+    // Set a data attribute to mark this pagenameDiv for future reference
+    pagenameDiv.setAttribute('data-pagename', pagename);
+
+    // Append the pagenameDiv to the container
+    container.appendChild(pagenameDiv);
+}
+
+function showPopup() {
+     
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const isAnyCheckboxPresent = checkboxes.length > 0;
+	
+    if (isAnyCheckboxPresent) {
+        const popupWindow = document.getElementById('popup-window');
+
+        // Find the first checkbox (regardless of its checked state)
+        const firstCheckbox = Array.from(checkboxes)[0];
+
+        // Get the bounding rectangle of the first checkbox's parent directory container
+        const directoryRect = firstCheckbox.closest('.directory-column').getBoundingClientRect();
+
+        // Position the popup relative to the bottom of the directory container
+        popupWindow.style.position = 'absolute';
+        popupWindow.style.left = `${directoryRect.left + window.scrollX + 15}px`; // Added 15px to the left
+        popupWindow.style.top = `${directoryRect.top + window.scrollY + 335}px`; // Added 335px to the top
+        popupWindow.style.transform = 'translate(0, 0)'; // Reset the transform
+        popupWindow.style.display = 'block';
+    }
+}
+
+
+function hidePopup() {
+    document.getElementById('popup-window').style.display = 'none';
+}
+
+async function deleteSelected() {
+    const checkedCheckboxes = document.querySelectorAll('.scrollable-content input[type="checkbox"]:checked');
+    const allCheckboxes = document.querySelectorAll('.scrollable-content input[type="checkbox"]');
+    const filesToDelete = Array.from(checkedCheckboxes).map(checkbox => checkbox.id);
+    const directoryName = selectedDirectory;
+
+    if (!directoryName) {
+        alert('Directory name not found');
+        return;
+    }
+
+    // Check if all checkboxes are checked
+    if (checkedCheckboxes.length === allCheckboxes.length) {
+        // Confirm with the user before deleting
+        const confirmDelete = confirm("All items are selected. Do you want to mark " + directoryName + " as completed?");
+        if (!confirmDelete) {
+            return; // Stop if user does not confirm
+        }
+    }
+
+    try {
+        const response = await fetch('/delete-files', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ files: filesToDelete, directoryName: directoryName })
+        });
+
+        if (response.ok) {
+            // Refresh the view or give some success message
+            fetchDirectories(); // Refresh the directory listing
+        } else {
+            // Handle errors
+            // alert('Error deleting files');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error deleting files');
+    }
+}
+
+document.getElementById('selectall-btn').addEventListener('click', selectall);
+document.getElementById('delete-selected-btn').addEventListener('click', deleteSelected);
+document.getElementById('return-btn').addEventListener('click', DoneEditing);
+
+
+
+function selectall() {
+     //console.log(selectAllState);
+    // Find all checkboxes within the renderEditView
+    const checkboxes = document.querySelectorAll('.scrollable-content input[type="checkbox"]');
+
+    // Set all checkboxes to the current state of selectAllState
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAllState;
+    });
+
+    // Toggle the state for the next call
+    selectAllState = !selectAllState;
+}
+
+
+
+function DoneEditing() {
+	    fetchDirectories();
+		selectedDirectory = null;
+		hidePopup();
+}
+
+function toggleUsernameField() {
+    var usernameField = document.getElementById("username");
+    var toggleSwitch = document.getElementById("toggleUsername");
+
+    if (toggleSwitch.checked) {
+        // If the switch is on, display the username field
+        usernameField.style.display = "block";
+    } else {
+        // If the switch is off, hide and clear the username field
+        usernameField.style.display = "none";
+        usernameField.value = "";
+    }
+}
+
+function showPressURL() {
+  // Use the new ID for the popup window
+  const popupWindow = document.getElementById('selectpress-popup-window') || createSelectPressPopupWindow();
+  popupWindow.innerHTML = ''; // Clear previous contents
+
+  // Create checkboxes for each press number
+  for (let i = 40; i <= 46; i++) {
+    const wrapper = document.createElement('div');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = 'press-' + i;
+    checkbox.checked = new URLSearchParams(window.location.search).has('press' + i);
+    checkbox.onchange = updatePressFilters; // Function to update URL based on selection
+    
+    const label = document.createElement('label');
+    label.htmlFor = 'press-' + i;
+    label.textContent = 'Press ' + i;
+    
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(label);
+    popupWindow.appendChild(wrapper);
+  }
+
+  popupWindow.style.display = 'none'; 
+}
+
+function showFilterPressPopup() {
+  // Use the new ID for the popup window
+  const popupWindow = document.getElementById('selectpress-popup-window') || createSelectPressPopupWindow();
+  popupWindow.innerHTML = ''; // Clear previous contents
+
+  // Close Button
+  const closeButton = document.createElement('button');
+  closeButton.textContent = 'x';
+  closeButton.className = 'close-btn';
+  closeButton.onclick = function() {
+    popupWindow.style.display = 'none';
+  };
+  popupWindow.appendChild(closeButton);
+  
+    // Title
+  const title = document.createElement('h4');
+  title.textContent = 'Filter View';
+  title.className = 'presspopup-title'; 
+  popupWindow.appendChild(title);
+
+
+  // Create checkboxes for each press number
+  for (let i = 40; i <= 46; i++) {
+    const wrapper = document.createElement('div');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = 'press-' + i;
+    checkbox.checked = new URLSearchParams(window.location.search).has('press' + i);
+    checkbox.onchange = updatePressFilters; // Function to update URL based on selection
+    
+    const label = document.createElement('label');
+    label.htmlFor = 'press-' + i;
+    label.textContent = 'Press ' + i;
+    
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(label);
+    popupWindow.appendChild(wrapper);
+  }
+
+  // Clear Button
+  const clearButton = document.createElement('button');
+  clearButton.textContent = 'Clear';
+  clearButton.className = 'clear-btn'; // Add a class to style it
+  clearButton.onclick = function() {
+  const checkboxes = popupWindow.querySelectorAll('input[type="checkbox"]');
+  for (const checkbox of checkboxes) {
+    checkbox.checked = false;
+  }
+  
+  updatePressFilters(); // Ensure your filtering logic is updated 
+};
+popupWindow.appendChild(clearButton);
+  
+  popupWindow.style.display = 'block'; // Show the popup
+}
+
+function createSelectPressPopupWindow() {
+  const popupWindow = document.createElement('div');
+  popupWindow.id = 'selectpress-popup-window';
+  document.body.appendChild(popupWindow);
+  return popupWindow;
+}
+
+
+function updatePressFilters() {
+  const params = new URLSearchParams(window.location.search);
+  
+  // Iterate over each checkbox to update the URL parameters
+  for (let i = 40; i <= 46; i++) {
+    const checkbox = document.getElementById('press-' + i);
+    if (checkbox.checked) {
+      params.set('press' + i, 'true');
+    } else {
+      params.delete('press' + i);
+    }
+  }
+  
+  // Update the URL without reloading the page
+  window.history.pushState({}, '', `${window.location.pathname}?${params}`);
+  fetchDirectories();
+}
+
+function updateCheckboxStatesFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  // Loop through all possible press numbers
+  for (let i = 40; i <= 46; i++) {
+    const pressParam = `press${i}`;
+    const checkbox = document.getElementById('press-' + i);
+    if (checkbox) {
+      // If the URL contains a parameter for this press, check the checkbox
+      checkbox.checked = urlParams.has(pressParam);
+    }
+  }
+  updatePressFilters();
+  fetchDirectories();
+}
+
+
+
+function extractPressNumber(directoryName) {
+  // This regex matches "_Press " followed by one or more digits at the end of the string.
+  const pattern = /_Press (\d+)$/;
+  const match = directoryName.match(pattern);
+  return match ? parseInt(match[1], 10) : null; // Convert matched digits to a number.
+}
+
+function getSelectedPressNumbers() {
+  const selectedPressNumbers = [];
+  for (let i = 40; i <= 46; i++) {
+    const checkbox = document.getElementById('press-' + i);
+    if (checkbox && checkbox.checked) {
+      selectedPressNumbers.push(i);
+    }
+  }
+  return selectedPressNumbers;
+}
+
+
+
+// dynamically change Login text
+function updateLoginModalText() {
+    var privilegedActionText = document.querySelector('#login-modal h2');
+    var pleaseAuthenticateText = document.querySelector('#login-modal p');
+
+    if (FromLogin === true) {
+        privilegedActionText.textContent = 'Login';
+        pleaseAuthenticateText.textContent = 'Please authenticate.';
+    } else {
+        privilegedActionText.textContent = 'Privileged Action!';
+        pleaseAuthenticateText.textContent = 'Please authenticate first.';
+    }
+}
+
+	function renderDirectoryOrFile(item, container, depth = 0) {
+		if(item.type === 'file' && item.name !== '-') {
+			const li = document.createElement('li');
+			li.textContent = item.name;
+			li.style.marginLeft = depth * 10 + 'px'; // Indent files under directories
+			if(item.name.endsWith('.CYAN')) {
+				li.classList.add('cyan-bullet');
+			} else if(item.name.endsWith('.MAGENTA')) {
+				li.classList.add('magenta-bullet');
+			} else if(item.name.endsWith('.YELLOW')) {
+				li.classList.add('yellow-bullet');
+			} else if(item.name.endsWith('.BLACK')) {
+				li.classList.add('black-bullet');
+			}
+			container.appendChild(li);
+		} else if(item.type === 'directory') {
+			const div = document.createElement('div');
+			div.className = 'sub-directory';
+			const headerTag = depth === 0 ? 'h2' : 'h3';
+			const header = document.createElement(headerTag);
+			header.textContent = item.name;
+			div.appendChild(header);
+			const ul = document.createElement('ul');
+			item.contents.forEach(subItem => renderDirectoryOrFile(subItem, ul, depth + 1)); // Increase depth for sub-items
+			div.appendChild(ul);
+			container.appendChild(div);
+		}
+	}
+
+function fetchDirectories() {
+var outerContainer = document.getElementById('outerContainer');
+  if (centerContainer) {
+    outerContainer.classList.add('center-container');
+  } else {
+    outerContainer.classList.remove('center-container');
+  }
+  
+    fetch('/get-directories')
+	.then(response => {
+        if (!response.ok) {
+            throw new Error('Server response not OK');
+        }
+        return response.json();
+    })
+	.then(directories => {
+	   // Group and sort directories based on 'orderView'
+	const selectedPressNumbers = getSelectedPressNumbers();   
+    let sortedDirectories;
+	
+      // If any press numbers are selected, filter directories by these numbers
+      if (selectedPressNumbers.length > 0) {
+          directories = directories.filter(directory => {
+          const pressNumber = extractPressNumber(directory.name);
+          return selectedPressNumbers.includes(pressNumber);
+        });
+      }
+	
+    if (orderView === 'newOrder') {
+		const completedDirs = directories.filter(dir => dir.fileCount === 0).sort((a, b) => a.modifyTime - b.modifyTime);
+		const unprocessedDirs = directories.filter(dir => dir.lastProcessed === null && dir.fileCount !==0).sort((a, b) => a.name.localeCompare(b.name));
+		
+        // determine the number of directories that dir => dir.lastProcessed !== null && dir.fileCount !==0.  Once that number is determined,
+		// set slices to equal that value
+		
+        // Filter directories where dir.type is 'directory' and dir.lastProcessed !== null && dir.fileCount !== 0
+        const filteredDirs = directories.filter(dir => dir.type === 'directory' && dir.lastProcessed !== null && dir.fileCount !== 0);
+
+        // Set slices to the number of directories that meet the condition
+        const slices = filteredDirs.length;
+		
+        // Now use slices in your preprocessingDirs logic
+		const preprocessingDirs = directories.filter(dir => dir.lastProcessed !== null && dir.fileCount !== 0).sort((a, b) => a.name.localeCompare(b.name)).slice(0, slices); // Limit slices to number of directories found
+		
+        // Filter inactive directories with modifyTime greater than one hour ago
+        const oneHourAgo = Math.floor((Date.now() - 60 * 60 * 1000) / 1000); // Convert one hour ago to Unix timestamp
+	
+		//const inactiveDirs = preprocessingDirs.filter(dir => new Date(dir.modifyTime) > oneHourAgo);
+		const inactiveDirs = preprocessingDirs.filter(dir => new Date(dir.modifyTime) <= oneHourAgo);
+		
+        // Filter processingDirs without directories with modify time greater than one hour from the present time
+        //const processingDirs = preprocessingDirs.filter(dir => new Date(dir.modifyTime) <= oneHourAgo);
+		const processingDirs = preprocessingDirs.filter(dir => new Date(dir.modifyTime) > oneHourAgo);
+		var sortedCount = 0;
+		if (HideUnprocessed === true) {
+		  sortedDirectories = [...completedDirs, ...processingDirs, ...inactiveDirs];
+		  sortedCount = sortedDirectories.length;
+		} else {
+		  if (SeparateJobs === true) {
+	    	  //Show HR_MARKER only if there are active processingDirs and or Completed jobs.
+	    	  if (slices === 0 && completedDirs.length === 0 ) {
+		      sortedDirectories = [...completedDirs, ...processingDirs, ...inactiveDirs, "FLEX_BREAK_MARKER", ...unprocessedDirs];
+			  sortedCount = (sortedDirectories.length -1);
+		     } else {
+			    //SHOW Completed, Active or Completed/Active in HR Text line
+			    var HRLINETEXT = 'COMPACT';
+				sortedDirectories = ["PROC_HR_MARKER", ...completedDirs, ...processingDirs, ...inactiveDirs, "FLEX_BREAK_MARKER", "HR_MARKER", ...unprocessedDirs];
+				sortedCount = (sortedDirectories.length -3);
+			    if (slices === 0 && completedDirs.length !== 0 ) {
+				  HRLINETEXT = 'COMP'; 
+				  }
+				else if (slices !== 0 && completedDirs.length === 0 ){
+				  HRLINETEXT = 'ACT';
+				  if (unprocessedDirs.length !== 0 ) {
+				    UnprocMenu = true;
+				    sortedDirectories = ["PROC_HR_MARKER", ...completedDirs, ...processingDirs, ...inactiveDirs, "FLEX_BREAK_MARKER", "HR_MARKER", ...unprocessedDirs];
+					sortedCount = (sortedDirectories.length -3);
+				  }else{
+				    UnprocMenu = false;
+				    sortedDirectories = ["PROC_HR_MARKER", ...completedDirs, ...processingDirs, ...inactiveDirs];
+					sortedCount = (sortedDirectories.length -1);
+				  }
+				}
+		     }
+           } else{
+		     sortedDirectories = [...completedDirs, ...processingDirs, ...inactiveDirs, ...unprocessedDirs];
+			 sortedCount = (sortedDirectories.length);
+		   }
+		}
+    } else {
+        // Default sorting (alpha-numeric)
+        sortedDirectories = directories.sort((a, b) => a.name.localeCompare(b.name));
+		sortedCount = (sortedDirectories.length);
+    }	
+        const container = document.querySelector('.directories-container');
+        container.innerHTML = '';
+		
+		console.log("sortedDirectories:", sortedDirectories.length, sortedCount);
+		
+	if (sortedCount === 0) {
+    // getSelectedPressNumbers() returns an array of selected press numbers
+    const selectedPressNumbers = getSelectedPressNumbers();
+    // Convert the array of numbers to a string to display in the alert message
+    let pressNumbersStr = '';
+    if (selectedPressNumbers.length > 1) {
+        const lastPressNumber = selectedPressNumbers.pop(); // Remove and save the last number
+        pressNumbersStr = selectedPressNumbers.join(', ') + ' & ' + lastPressNumber; // Rejoin without the last and add it with " &"
+    } else if (selectedPressNumbers.length === 1) {
+        pressNumbersStr = selectedPressNumbers[0];
+    }
+	if (HideUnprocessed === true) {
+	 showAlert(`Hide unprocessed jobs selected.  There are no Active jobs to display`, 7500);
+	}else{
+    // If there are selected press numbers, show the alert with them
+    if (pressNumbersStr) {
+        showAlert(`No job listing for selected press ${pressNumbersStr}`, 7500);
+    } else {
+        // Handle the case when no press numbers are selected, if necessary
+        showAlert('No job listings', 7500);
+    }
+	}
+    // Optional: You might want to return or perform some other action here to avoid further processing
+} else {	
+		
+        sortedDirectories.forEach(directory => {
+		//FLEX_BREAK_MARKER virtically separates processingDirs form unprocessedDirs
+		if (directory === "FLEX_BREAK_MARKER") {
+        const flexBreak = document.createElement('div');
+        flexBreak.className = 'flex-break';
+        container.appendChild(flexBreak);
+    } else if (directory === "HR_MARKER") {
+        const horizontalLine = document.createElement('hr');
+		horizontalLine.className = 'hr-text';
+        container.appendChild(horizontalLine);
+    } else if (directory === "PROC_HR_MARKER") {
+        const horizontalLine = document.createElement('hr');
+		horizontalLine.className = 'pr-hr-text';
+		horizontalLine.setAttribute('data-content', HRLINETEXT);
+        container.appendChild(horizontalLine);
+    } else {
+
+            const column = document.createElement('div');
+	        //const column = createDirectoryColumn(directory); 
+            column.className = 'directory-column';
+
+			
+				if(directory.fileCount === 0) {
+				    if(selectedDirectory === directory.name){
+					  //When last file manually deleted in Edit View
+					  hidePopup();
+					  selectedDirectory = null;
+					}
+					
+        // Update the stored fileCount
+        directoryFileCounts[directory.name] = directory.fileCount;
+    					
+					column.classList.add('empty');
+					const modifyTime = new Date(directory.modifyTime * 1000);
+					const timeStr = modifyTime.toLocaleTimeString('en-US', {
+						hour: 'numeric',
+						minute: 'numeric',
+						hour12: true
+					});
+					const completedMessage = document.createElement('div');
+					completedMessage.className = 'completed-message';
+					completedMessage.innerText = `Completed:\n${timeStr}`;
+					column.appendChild(completedMessage);
+				}
+				const h2 = document.createElement('h2');
+				let vdate = directory.name.substring(0, 6);
+				let remainingPart = directory.name.substring(6);
+				let underscoreIndex = remainingPart.indexOf('_');
+				let vpub = remainingPart.substring(0, underscoreIndex);
+				let vpress = remainingPart.substring(underscoreIndex + 1);
+				vpress = vpress.replace("Press", "");
+				const vpubSpan = document.createElement('span'); // create a span for vpub
+				vpubSpan.textContent = vpub;
+				h2.appendChild(vpubSpan);
+				const vdateSpan = document.createElement('span');
+				vdateSpan.textContent = vdate;
+				vdateSpan.className = 'vdate-style';
+				h2.appendChild(vdateSpan);
+				// h2.appendChild(document.createTextNode(" " + vdate + " "));
+				const vpressSpan = document.createElement('span');
+				vpressSpan.textContent = vpress;
+				if (directory.lastProcessed === null) {
+				  vpressSpan.className = 'vpress-style-unproc';
+				} else {
+				  vpressSpan.className = 'vpress-style';
+				}
+				h2.appendChild(vpressSpan);
+				column.appendChild(h2);
+				const fileCountBadge = document.createElement('span');
+				fileCountBadge.style.position = 'absolute';
+				fileCountBadge.style.top = '60px';
+				fileCountBadge.style.right = '28px';
+				if (directory.lastProcessed === null) {
+				  fileCountBadge.style.backgroundColor = 'gray';
+				} else {
+				  fileCountBadge.style.backgroundColor = '#330066';
+				}
+				fileCountBadge.style.color = 'white';
+				fileCountBadge.style.borderRadius = '50%';
+				fileCountBadge.style.padding = '5px 10px';
+				fileCountBadge.style.fontFamily = 'Arial, sans-serif';
+				fileCountBadge.style.fontSize = '45px';
+				fileCountBadge.style.fontWeight = 'bold'
+				fileCountBadge.textContent = directory.fileCount || '0';
+				column.appendChild(fileCountBadge);
+				if(directory.fileCount === 0) {
+					column.classList.add('empty');
+					const modifyTime = new Date(directory.modifyTime * 1000); // assuming UNIX timestamp from server
+					const timeStr = modifyTime.toLocaleTimeString('en-US', {
+						hour: 'numeric',
+						minute: 'numeric',
+						hour12: true
+					});
+					//							fileCountBadge.textContent = timeStr;  // display modify time
+					//							fileCountBadge.textContent = '√'; // display checkmark
+				}
+				const scrollableContent = document.createElement('div');
+				scrollableContent.className = 'scrollable-content';
+				
+
+				const ul = document.createElement('ul');
+				            
+			if (isAlternateView) {
+			    if (selectedDirectory === directory.name) {
+				  //EditView
+				  scrollableContent.style.marginTop = '4px';
+                  directory.contents.forEach(item => renderEditView(item, scrollableContent, selectedDirectory, directory.name)); // Pass scrollableContent here
+				} else {
+				  scrollableContent.style.marginTop = '4px';
+                  directory.contents.forEach(item => renderAlternateView(item, scrollableContent, selectedDirectory, directory.name)); // Pass scrollableContent here
+				}
+            } else {
+			    hidePopup();
+                const ul = document.createElement('ul');
+                directory.contents.forEach(item => renderDirectoryOrFile(item, ul));
+                scrollableContent.appendChild(ul); // Append ul to scrollableContent
+            }
+
+				scrollableContent.appendChild(ul);
+				column.appendChild(scrollableContent);
+				addDeleteButton(column, directory.name, directory.fileCount, directory.lastProcessed, directory.modifyTime);
+				addHoverMenu(column, directory.name, directory.fileCount);
+				container.appendChild(column);
+				
+			   // Check if fileCount has changed
+		       handleDirectoryCountChange(directory, directory.fileCount);
+            // Add logic to display LastProcessed if not null
+            if (directory.lastProcessed !== null && UtilView === true) {
+                const popup = lastProcPopup(directory.lastProcessed);
+                column.appendChild(popup); // Append the popup to the directory column
+            }
+}
+			});
+			}
+		}).catch(error => {
+		  // console.error('Fetch failed:', error);
+          // Check if the error message contains 'net::ERR_CONNECTION_REFUSED'
+          if (error.message.includes('Failed to fetch')) {
+            showAlert('Server Offline', 7500); // Display the custom alert
+		}
+    });
+   
+}
+
+// Function to create a popup element Last Processed Plate
+function lastProcPopup(content) {
+    let popup = document.createElement('div');
+    popup.classList.add('last-processed-popup');
+
+    // Find the last opening bracket '[' and the subsequent closing bracket ']'
+    const lastIndexOpenBracket = content.lastIndexOf('[');
+    const lastIndexCloseBracket = content.indexOf(']', lastIndexOpenBracket);
+
+    if (lastIndexOpenBracket !== -1 && lastIndexCloseBracket !== -1) {
+        // Text before the last opening bracket
+        const beforeText = content.substring(0, lastIndexOpenBracket);
+
+        // Text between the last opening and closing brackets
+        const bracketedText = content.substring(lastIndexOpenBracket + 1, lastIndexCloseBracket).toLowerCase();
+
+        // Append the beforeText as is
+        popup.appendChild(document.createTextNode(beforeText));
+
+        // Create a new span for the bracketedText
+        let textSpan = document.createElement('span');
+        textSpan.textContent = bracketedText; // The text inside the last brackets
+
+        // Apply color rules based on text ending
+        if (bracketedText.endsWith('.cyan')) {
+            textSpan.style.backgroundColor = '#AFEEEE';
+            textSpan.style.color = '#000000';
+        } else if (bracketedText.endsWith('.magenta')) {
+            textSpan.style.backgroundColor = '#800080';
+            textSpan.style.color = 'white';
+        } else if (bracketedText.endsWith('.yellow')) {
+            textSpan.style.backgroundColor = 'yellow';
+            textSpan.style.color = 'black';
+        } else if (bracketedText.endsWith('.black')) {
+            textSpan.style.backgroundColor = 'Black';
+            textSpan.style.color = 'white';
+        } else {
+            // Default styles if none of the conditions are met
+            textSpan.style.backgroundColor = 'white';
+            textSpan.style.color = 'black';
+			textSpan.style.border = '1px solid black';
+        }
+		textSpan.style.fontWeight = 'bold'; 
+        textSpan.style.padding = '2px 4px'; // Add padding
+		textSpan.style.border = '1px solid #aaa';
+        textSpan.style.display = 'inline-block'; // Ensure it's inline
+
+        // Append the new span to the popup
+        popup.appendChild(textSpan);
+    } else {
+        // If the format is not as expected, use the original content
+        popup.textContent = content;
+    }
+
+    return popup;
+}
+
+
+function addDeleteButton(column, directoryName, fileCount, directoryproc, modifyTime) {
+  const hr1Ago = Math.floor((Date.now() - 60 * 60 * 1000) / 1000);
+  const deleteBtn = document.createElement('div');
+  deleteBtn.className = 'style-for-delete-btn';
+  // color button white if no files have been processed yet.
+  if (directoryproc === null) {
+	deleteBtn.classList.add('style-for-unproc-btn');
+	
+        // Extract the components from directoryName
+        let vdate = directoryName.substring(0, 6);
+        let remainingPart = directoryName.substring(6);
+        let underscoreIndex = remainingPart.indexOf('_');
+        let vpub = remainingPart.substring(0, underscoreIndex);
+        let vpress = remainingPart.substring(underscoreIndex + 1).split(' ').pop(); // Gets the last numeric part
+        deleteBtn.classList.add('style-for-unproc-btn');
+
+        const directoryColumnElements = column.querySelectorAll('.directory-column h2, .directory-column h3');
+
+        directoryColumnElements.forEach((element) => {
+            // Check if the element's text includes vdate, vpub, and vpress
+            if (element.textContent.includes(vdate) && element.textContent.includes(vpub) && element.textContent.includes(vpress)) {
+                element.style.backgroundColor = 'gray'; // Set the color for matching elements
+            }
+        });
+		
+		
+    }else if (fileCount !== 0 && modifyTime < hr1Ago ) {
+	  deleteBtn.classList.add('style-for-inactive-btn');
+	}
+	
+  
+ // deleteBtn.title = "Clear or Delete listing...";
+		if(fileCount === 0) {
+			deleteBtn.classList.add('red-delete-btn');
+			deleteBtn.onclick = function() {
+				openDeleteDialog(directoryName);
+			};
+			//               deleteBtn.onclick = null; // disable onclick
+		} else {
+			deleteBtn.onclick = function() {
+			openDeleteDialog(directoryName);
+			};
+		}
+
+  deleteBtn.addEventListener('mouseenter', function () {
+    const hoverMenu = column.querySelector('.hover-menu');
+    hoverMenu.style.display = 'block';
+  });
+
+deleteBtn.addEventListener('mouseleave', function () {
+    const hoverMenu = column.querySelector('.hover-menu');
+    setTimeout(function () {
+        hoverMenu.style.display = 'none';
+    }, 5000); // Change the delay time (in milliseconds) as needed
+});
+  column.appendChild(deleteBtn);
+}
+
+function blinkDeleteButton(directoryName, fileCount) {
+    // Extract the components from directoryName
+    let vdate = directoryName.substring(0, 6);
+    let remainingPart = directoryName.substring(6);
+    let underscoreIndex = remainingPart.indexOf('_');
+    let vpub = remainingPart.substring(0, underscoreIndex);
+    let vpress = remainingPart.substring(underscoreIndex).split(' ').pop(); // Gets the last numeric part
+    // Find the target directory
+    const directories = document.querySelectorAll('.directory-column');
+    let targetDirectory = null;
+    directories.forEach(directory => {
+        const h2 = directory.querySelector('h2');
+        if (h2) {
+            const vdateSpan = h2.querySelector('.vdate-style');
+            const vpubSpan = h2.querySelector('span:not(.vdate-style):not(.vpress-style)');
+            const vpressSpan = h2.querySelector('.vpress-style');
+
+            if (vdateSpan && vpubSpan && vpressSpan) {
+                if (vdateSpan.textContent.trim() === vdate &&
+                    vpubSpan.textContent.trim() === vpub &&
+                    vpressSpan.textContent.trim().replace("Press ", "") === vpress) {
+                    targetDirectory = directory;
+                }
+            }
+        }
+    });
+
+    // Blink the delete button if the target directory is found
+    if (targetDirectory) {
+        const deleteBtn = targetDirectory.querySelector('.style-for-delete-btn');
+        if (deleteBtn) {
+            let blinkCount = 0;
+            let isGreen = false;
+            const blinkInterval = setInterval(() => {
+			if (fileCount >= 12) {
+                deleteBtn.style.backgroundColor = isGreen ? '#00ff00' : '#83b874';
+			}else{
+			    deleteBtn.style.backgroundColor = isGreen ? '#ff0505' : '#83b874';
+			}
+                isGreen = !isGreen;
+                blinkCount++;
+                if (blinkCount >= 10) {
+                    clearInterval(blinkInterval);
+                    deleteBtn.style.backgroundColor = '#83b874'; // Reset to default color
+                }
+            }, 1000); // Change color every 750ms
+        } else {
+            console.error('Delete button not found in directory:', directoryName);
+        }
+    } 
+}
+
+
+function handleDirectoryCountChange(directory, fileCount) {
+    // Check if the directory is already tracked, if not initialize it
+    if (directoryFileCounts[directory.name] == null) {
+        directoryFileCounts[directory.name] = directory.fileCount;
+        directoryCycleCounts[directory.name] = 0;
+    }
+
+    // Check if the file count has changed or the cycle count is within 1-5
+    if (directoryFileCounts[directory.name] !== directory.fileCount || (directoryCycleCounts[directory.name] >= 1 && directoryCycleCounts[directory.name] <= 5)) {
+        // If the file count has changed and we are in the middle of a cycle, reset the cycle count to 1
+        if (directoryFileCounts[directory.name] !== directory.fileCount && directoryCycleCounts[directory.name] > 0) {
+            directoryCycleCounts[directory.name] = 1;
+        } else {
+            // Increment the cycle count
+            directoryCycleCounts[directory.name]++;
+        }
+
+        // Blink the delete button
+        blinkDeleteButton(directory.name, fileCount);
+
+        // Reset the cycle count after the third pass
+        if (directoryCycleCounts[directory.name] > 5) {
+            directoryCycleCounts[directory.name] = 0;
+        }
+    }
+
+    // Always update the file count
+    directoryFileCounts[directory.name] = directory.fileCount;
+}
+
+
+
+function showLoginModal() {
+    document.getElementById('login-modal').style.display = 'block';
+}
+
+function closeLoginModal() {
+    FromLogin = null;
+	updateLoginModalText();
+    document.getElementById('login-modal').style.display = 'none';
+	    if (UtilView) {
+        toggleViewElement.style.color = 'red'; // Change the color back to red
+    } else if (isAuthenticated){
+        toggleViewElement.style.color = 'black'; // Change the color to black
+		showAlert('Logged In', 1500);
+    } else {
+		toggleViewElement.style.color = 'gray';
+	}
+}
+
+function showAlert(message, duration) {
+    var alertBox = document.getElementById('customAlert');
+    alertBox.innerHTML = message; // Set the message in the alert box
+    alertBox.style.display = 'block'; // Show the alert box
+
+    // Hide the alert box after 'duration' milliseconds
+    setTimeout(function() {
+        alertBox.style.display = 'none';
+    }, duration);
+}
+
+
+function authenticate() {
+    const toggleSwitch = document.getElementById('toggleUsername');
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    // Check if the switch is on and username is blank
+    if (toggleSwitch.checked && !username.trim()) {
+        alert('Username cannot be blank in advanced authentication mode.');
+        return; // Prevent form submission
+    }
+
+    const data = username ? { username, password } : { password };
+    fetch('/authenticate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.authenticated) {
+            isAuthenticated = true;
+			authLevel = data.level; // Update the auth level based on response
+            // Handle different levels of authentication based on the response
+            handleAuthenticationLevel(data.level);
+            closeLoginModal();
+        } else {
+            alert('Incorrect credentials');
+        }
+    });
+}
+
+
+function handleAuthenticationLevel(level) {
+    // Implementation depends on how different levels are supposed to interact with your app
+    console.log("Authenticated as:", level);
+}
+
+
+function confirmClearList() {
+
+  const directoryName = getDirectoryName();
+  if (confirm(`Are you sure you want to mark ${directoryName} as completed ?`)) {
+    executeAction('clear', directoryName);
+  }
+  
+}
+
+function confirmDeleteList() {
+   
+  const directoryName = getDirectoryName();
+  if (confirm(`Are you sure you want to delete the job ${directoryName} and all its contents?`)) {
+    executeAction('delete', directoryName);
+  }
+}
+
+function getDirectoryName() {
+  const directoryNameSpan = document.getElementById('directory-name');
+  return directoryNameSpan.textContent;
+}
+
+
+function addHoverMenu(column, directoryName, fileCount) {
+  if (selectedDirectory !== directoryName || selectedDirectory === null ) {
+   const hoverMenu = document.createElement('div');
+   hoverMenu.className = 'hover-menu';
+
+  if (fileCount === 0) {
+
+    const deleteButton = document.createElement('div');
+    deleteButton.className = 'menu-item';
+    deleteButton.textContent = 'Delete';
+    deleteButton.onclick = function () {
+	     if (!isAuthenticated) {
+        showLoginModal();
+        return;
+    }
+      if (confirm(`Are you sure you want to delete ${directoryName}?`)) {
+        executeAction('delete', directoryName);
+      }
+    };
+    hoverMenu.appendChild(deleteButton);
+  } else {
+
+   const clearButton = document.createElement('div');
+   clearButton.className = 'menu-item';
+   clearButton.textContent = 'Mark as Completed';
+   clearButton.onclick = function () {
+       if (!isAuthenticated) {
+        showLoginModal();
+        return;
+    }
+       if (confirm(`Are you sure you want to mark ${directoryName} as completed?`)) {
+           executeAction('clear', directoryName);
+       }
+   };
+
+   const editListButton = document.createElement('div');
+   editListButton.className = 'menu-item';
+   editListButton.textContent = 'Edit List';
+   editListButton.onclick = function () {
+    if (!isAuthenticated) {
+        showLoginModal();
+        return;
+    }
+    // Toggle the visibility of the edit icon
+    const editIcon = document.querySelector('.edit-icon');
+    if (editIcon) {
+        editIcon.style.visibility = 'visible';
+    }
+    selectDirectoryForEditing(directoryName);
+    fetchDirectories();
+	hidePopup();
+	};
+
+   const deleteButton = document.createElement('div');
+   deleteButton.className = 'menu-item';
+   deleteButton.textContent = 'Delete';
+   deleteButton.onclick = function () {
+   if (!isAuthenticated) {
+        showLoginModal();
+        return;
+    }
+       if (confirm(`Are you sure you want to delete ${directoryName}?`)) {
+           executeAction('delete', directoryName);
+       }
+   };
+
+   hoverMenu.appendChild(clearButton);
+   if (isAlternateView) {
+   hoverMenu.appendChild(editListButton);
+   }
+   hoverMenu.appendChild(deleteButton);
+}
+   column.appendChild(hoverMenu);
+
+   // Add event listeners to handle hover menu visibility
+   let hoverMenuTimeout = null; // Variable to store the timeout ID
+
+   column.addEventListener('mouseleave', function () {
+       // Start a timer to hide the menu after a delay
+       hoverMenuTimeout = setTimeout(function () {
+           hoverMenu.style.display = 'none';
+       }, 5000); // 2-second delay (adjust as needed)
+   });
+
+   hoverMenu.addEventListener('mouseenter', function () {
+       // If the mouse enters the hover menu, clear the timeout
+       if (hoverMenuTimeout) {
+           clearTimeout(hoverMenuTimeout);
+       }
+   });
+
+   hoverMenu.addEventListener('mouseleave', function () {
+       // When the mouse leaves the hover menu, start a new timer (if needed)
+       hoverMenuTimeout = setTimeout(function () {
+           hoverMenu.style.display = 'none';
+       }, 5000); // 2-second delay (adjust as needed)
+   });
+   }
+}
+
+
+	let isHovering = false; // Flag to check if hovering over .directory-column
+	let extendedTimeout = null; // Timer for the 30-second fetch
+	let directoryToDelete = '';
+	let actionType = ''; // This variable will store either 'clear' or 'delete' based on the user's choice
+	function openDeleteDialog(directoryName) {
+		directoryToDelete = directoryName;
+		document.getElementById('directory-name').textContent = directoryName; // Displaying directory name in modal
+		document.getElementById('delete-modal').style.display = 'block';
+		document.getElementById('overlay').style.display = 'block';
+	}
+
+	function closeModal() {
+		document.getElementById('delete-modal').style.display = 'none';
+		document.getElementById('overlay').style.display = 'none';
+		directoryToDelete = '';
+		actionType = ''; // Clear the action type
+	}
+
+	function clearDirectory() {
+		actionType = 'clear';
+		if(confirm(`Are you sure you want to mark ${directoryToDelete} as completed ?`)) {
+			executeAction();
+		}
+	}
+
+	function confirmDelete() {
+		actionType = 'delete';
+		if(confirm(`Are you sure you want to delete the directory ${directoryToDelete} and all its contents?`)) {
+			executeAction();
+		}
+	}
+
+function executeAction(actionType, directoryName) {
+  let endpoint = '';
+  if (actionType === 'clear') {
+    endpoint = '/clear-directory';
+  } else if (actionType === 'delete') {
+    endpoint = '/delete-directory';
+  }
+
+  fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ directoryName: directoryName }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        alert(`Error ${actionType === 'clear' ? 'clearing' : 'deleting'} directory`);
+      } else {
+        fetchDirectories(); // Refresh directory listing after action
+      }
+    });
+
+  closeModal();
+}
+
+	// Additional JavaScript for scrollbar visibility handling
+	document.querySelector('.directories-container').addEventListener('scroll', (event) => {
+		if(event.target.classList.contains('directory-column')) {
+			const directory = event.target;
+			directory.style.scrollbarColor = 'rebeccapurple green';
+			directory.style.setProperty('--webkit-scrollbar-thumb', 'rebeccapurple');
+			clearTimeout(window.scrollTimeout);
+			window.scrollTimeout = setTimeout(() => {
+				if(!directory.matches(':hover')) {
+					directory.style.scrollbarColor = 'transparent transparent';
+					directory.style.setProperty('--webkit-scrollbar-thumb', 'transparent');
+				}
+			}, 1000);
+		}
+	});
+	// Hover over .directory-column
+	document.addEventListener('mouseenter', (event) => {
+    // Check if event.target and event.target.classList are not null before calling contains
+    if(event.target && event.target.classList && event.target.classList.contains('directory-column')) {
+        isHovering = true; // Set flag
+        // If there's a pending extended fetch, clear it
+        if(extendedTimeout) {
+            clearTimeout(extendedTimeout);
+        }
+        // Set up the extended 30-second fetch
+        extendedTimeout = setTimeout(() => {
+            fetchDirectories();
+            isHovering = false; // Reset flag after fetching
+        }, 30000);
+    }
+}, true);
+
+	// Stop hovering over .directory-column
+	document.addEventListener('mouseleave', (event) => {
+    // Check if event.target and event.target.classList are not null before calling contains
+    if(event.target && event.target.classList && event.target.classList.contains('directory-column')) {
+        isHovering = false; // Reset flag
+        // If there's a pending extended fetch, clear it
+        if(extendedTimeout) {
+            clearTimeout(extendedTimeout);
+        }
+    }
+}, true);
+
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleViewElement = document.getElementById('toggleView');
+    const contextMenu = document.getElementById('contextMenu');
+
+    toggleViewElement.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+        showContextMenu(event.pageX, event.pageY);
+    });
+
+    document.addEventListener('click', function() {
+        contextMenu.style.display = 'none';
+    });
+});
+
+
+function showContextMenu(x, y) {
+    const contextMenu = document.getElementById('contextMenu');
+    contextMenu.innerHTML = ''; // Clear previous menu items
+		addMenuItem(contextMenu, 'Filter Press', function() {
+			showFilterPressPopup(); // This function will show the popup with checkboxes
+		});	
+	
+		 if (centerContainer === false) {
+		    addMenuItem(contextMenu, 'Adjust Left Margin', function() {
+		    toggleCenterContainers();
+		    fetchDirectories();
+            });
+		  } else {
+		    addMenuItem(contextMenu, 'Left-Justify content', function() {
+		    toggleCenterContainers();
+		    fetchDirectories();
+            });
+		  }
+		  
+		  
+        addMenuItem(contextMenu, 'Zoom +/-', function() {
+			document.getElementById('zoomControl').style.display = 'block'; // Make the zoom controls visible
+        });
+
+		  
+    if (orderView === "newOrder") {
+		  addMenuItem(contextMenu, 'List in unsorted order', function() {
+		  toggleOrderView();
+		  fetchDirectories();
+         });
+		 if (HideUnprocessed === false) {
+		 if (SeparateJobs === false) {
+		    addMenuItem(contextMenu, 'List in separate rows', function() {
+		    toggleSeparateJobs();
+		    fetchDirectories();
+            });
+		  } else {
+		    addMenuItem(contextMenu, 'Combine Listing', function() {
+		    toggleSeparateJobs();
+		    fetchDirectories();
+            });
+		  }
+		  }
+		  if (UnprocMenu === true){
+		  if (HideUnprocessed === false) {
+		    addMenuItem(contextMenu, 'Hide unprocessed jobs', function() {
+		    toggleHideUnprocessed();
+		    fetchDirectories();
+            });
+		  } else {
+		    addMenuItem(contextMenu, 'Show Unprocessed jobs', function() {
+		    toggleHideUnprocessed();
+		    fetchDirectories();
+            });
+		  }
+		  }
+		} else {
+		  addMenuItem(contextMenu, 'List in priority order', function() {
+          toggleOrderView();
+		  fetchDirectories();
+		  });
+		}
+
+    if (!isAuthenticated) {
+        addMenuItem(contextMenu, 'Login', function() {
+            // Login logic here
+			FromLogin = true;
+			updateLoginModalText();
+            showLoginModal();
+        });
+    } else {
+		if (authLevel === "level3"){
+		    addMenuItem(contextMenu, 'Toggle Utilview', function() {
+			toggleUtilView();
+			fetchDirectories();
+        });
+		}
+
+        addMenuItem(contextMenu, 'Logout', function() {
+            // Logout logic here
+			showAlert('Logged Out', 1500);
+			authLevel = null;
+			UtilView = false;
+			isAuthenticated = false;
+			toggleViewElement.style.color = 'gray';
+			DoneEditing();
+        });
+    }
+		
+    contextMenu.style.top = y + 'px';
+    contextMenu.style.left = x + 'px';
+    contextMenu.style.display = 'block';
+}
+
+function addMenuItem(menu, text, callback) {
+    const menuItem = document.createElement('div');
+    menuItem.className = 'menu-item';
+    menuItem.textContent = text;
+    menuItem.onclick = callback;
+    menu.appendChild(menuItem);
+}
+
+
+
+// Modified interval setup
+setInterval(() => {
+    if (!isHovering) { // Continue with your existing condition
+        if (selectedDirectory !== null) {
+            // Refresh every 5 minutes when selectedDirectory is not null
+            setTimeout(fetchDirectories, 5 * 60 * 1000);
+        } else {
+            // Apply other conditions or default refresh rate when selectedDirectory is null
+            fetchDirectories();
+        }
+    }
+}, 5000); // This interval checks every 5 seconds if conditions have changed
+    
+	fetchDirectories();
+	</script>
+</body>
+
+</html>
